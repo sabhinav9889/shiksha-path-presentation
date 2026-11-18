@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shiksha Path: project and AI development</title>
+<style>
+  :root {
+    --ink: #1c1d3a;
+    --muted: #5b5e7a;
+    --bg: #f3f4fa;
+    --card: #ffffff;
+    --line: #dfe1ee;
+    --primary: #2d37b0;
+    --primary-soft: #e8e9f7;
+    --accent: #e8890c;
+    --accent-soft: #fdf0dc;
+    --good: #1c7c54;
+    --bad: #b3261e;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #0f1030; }
+  body {
+    font-family: "Noto Sans", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    overflow: hidden;
+  }
+  #stage { position: fixed; inset: 0; display: grid; place-items: center; }
+  #deck { width: 1280px; height: 720px; position: relative; transform-origin: center center; }
+  .slide {
+    position: absolute; inset: 0; display: none; flex-direction: column;
+    padding: 56px 72px 64px; background: var(--bg); overflow: hidden;
+  }
+  .slide.active { display: flex; }
+  .slide::after {
+    content: attr(data-n); position: absolute; right: 36px; bottom: 22px;
+    font-size: 16px; color: var(--muted);
+  }
+  h1 { font-size: 76px; line-height: 1.02; margin: 0; letter-spacing: -1px; }
+  h2 { font-size: 42px; line-height: 1.12; margin: 0 0 6px; letter-spacing: -0.4px; }
+  h3 { font-size: 24px; margin: 0 0 8px; }
+  p { margin: 0; }
+  .eyebrow { font-size: 18px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--primary); margin-bottom: 12px; }
+  .lede { font-size: 26px; color: var(--muted); margin: 6px 0 0; line-height: 1.35; }
+  .body { flex: 1; display: flex; gap: 28px; margin-top: 26px; min-height: 0; }
+  .col { flex: 1; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 22px 26px; }
+  .card.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .card.accent { background: var(--accent-soft); border-color: #f2d6a8; }
+  ul { margin: 0; padding-left: 26px; font-size: 24px; line-height: 1.38; }
+  ul.tight { font-size: 21px; line-height: 1.35; }
+  li { margin-bottom: 6px; }
+  .small { font-size: 20px; color: var(--muted); line-height: 1.35; }
+  .tag { display: inline-block; font-size: 16px; font-weight: 700; padding: 3px 11px; border-radius: 99px; background: var(--primary-soft); color: var(--primary); }
+  .tag.good { background: #dff3e9; color: var(--good); }
+  .tag.warn { background: var(--accent-soft); color: #9a5b00; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; min-height: 0; }
+  .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .stat { text-align: center; }
+  .stat b { display: block; font-size: 54px; line-height: 1; color: var(--primary); letter-spacing: -1px; }
+  .stat span { display: block; margin-top: 8px; font-size: 19px; color: var(--muted); line-height: 1.25; }
+  .phones { display: flex; gap: 30px; justify-content: center; align-items: flex-start; }
+  .phone { width: 208px; text-align: center; }
+  .phone img { width: 208px; height: 408px; object-fit: cover; object-position: top; border-radius: 22px; border: 6px solid #1c1d3a; background: #fff; display: block; }
+  .phone p { margin-top: 10px; font-size: 18px; line-height: 1.3; color: var(--ink); }
+  table { width: 100%; border-collapse: collapse; font-size: 20px; }
+  th { text-align: left; font-size: 16px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); padding: 0 14px 8px; }
+  td { padding: 10px 14px; border-top: 1px solid var(--line); vertical-align: top; line-height: 1.3; }
+  td:first-child { font-weight: 700; }
+  table.w3 td:nth-child(1), table.w3 th:nth-child(1) { width: 46%; }
+  table.w3 td:nth-child(2), table.w3 th:nth-child(2) { width: 18%; }
+  .flow { display: flex; align-items: stretch; gap: 10px; }
+  .step { flex: 1; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 14px; position: relative; }
+  .step b { display: block; font-size: 21px; margin-bottom: 6px; }
+  .step span { font-size: 17px; color: var(--muted); line-height: 1.3; display: block; }
+  .step i { position: absolute; top: -13px; left: 14px; font-style: normal; background: var(--accent); color: #fff; font-weight: 700; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 16px; }
+  .arrow { align-self: center; font-size: 26px; color: var(--primary); }
+  .center { justify-content: center; }
+  .quote { font-size: 30px; line-height: 1.35; font-weight: 600; }
+  .bar { height: 6px; background: var(--accent); border-radius: 6px; width: 90px; margin: 16px 0 18px; }
+  svg text { font-family: inherit; }
+  #hint { position: fixed; left: 14px; bottom: 10px; color: #8a8cb0; font-size: 12px; z-index: 5; }
+  #progress { position: fixed; left: 0; bottom: 0; height: 4px; background: var(--accent); z-index: 5; transition: width .2s; }
+  @media print {
+    @page { size: 1280px 720px; margin: 0; }
+    html, body { background: none; overflow: visible; height: auto; }
+    #stage { position: static; display: block; }
+    #deck { transform: none !important; width: 1280px; height: auto; }
+    .slide { display: flex !important; position: relative; width: 1280px; height: 720px; page-break-after: always; break-after: page; }
+    #hint, #progress { display: none; }
+  }
+</style>
+</head>
+<body>
+<div id="stage"><div id="deck">
+
+<!-- 1 -->
+<section class="slide" data-n="1" style="flex-direction:row; align-items:center; gap:40px;">
+  <div style="flex:1;">
+    <div class="eyebrow">AI Product Hackathon 2026 · First prize</div>
+    <h1>Shiksha Path</h1>
+    <div class="bar"></div>
+    <p class="lede" style="color:var(--ink); font-size:32px;">Learning that works offline, in Hindi, on a shared phone.</p>
+    <p class="lede" style="margin-top:22px;">Built end to end with Claude Code, directed by one developer.</p>
+    <p class="small" style="margin-top:46px;">github.com/sabhinav9889/shiksha-path<br>shiksha-path.pages.dev</p>
+  </div>
+  <div class="phone" style="width:300px;">
+    <img src="assets/phone-home.png" alt="Shiksha Path home screen on a phone: streak, progress in three tracks and today's lesson" style="width:300px;height:560px;">
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="slide" data-n="2">
+  <div class="eyebrow">The problem</div>
+  <h2>Good learning does not reach the students who need it</h2>
+  <div class="body">
+    <div class="grid3" style="flex:1; align-items:stretch;">
+      <div class="card"><h3>Students</h3><ul class="tight">
+        <li>Hindi speakers from villages and small towns</li><li>Many are minors</li><li>Weak English, patchy data</li><li>One phone shared by a family</li></ul></div>
+      <div class="card"><h3>Mentors</h3><ul class="tight">
+        <li>Cannot see who is stuck or has stopped coming</li><li>Cannot hear how a student speaks</li><li>A WhatsApp group shows no progress and no privacy controls</li></ul></div>
+      <div class="card"><h3>The NGO</h3><ul class="tight">
+        <li>Wants each mentor to help more students</li><li>Must protect children's data</li><li>Needs an audit trail of who did what</li></ul></div>
+    </div>
+  </div>
+  <div class="card accent" style="margin-top:6px;"><p class="quote" style="font-size:26px;">Most learning apps assume fast internet, English readers and one user per phone.</p></div>
+</section>
+
+<!-- 3 -->
+<section class="slide" data-n="3">
+  <div class="eyebrow">The solution</div>
+  <h2>One product, two sides</h2>
+  <div class="body">
+    <div class="col card" style="gap:6px;">
+      <h3>Student app <span class="tag">PWA, no app store</span></h3>
+      <ul class="tight">
+        <li>Lessons download once and run with no network</li>
+        <li>Hindi first, English alongside</li>
+        <li>A reason is shown for every wrong answer</li>
+        <li>Speaking practice, recorded and played back</li>
+        <li>A 4-digit PIN per profile on a shared phone</li>
+      </ul>
+    </div>
+    <div class="col card" style="gap:6px;">
+      <h3>Staff section <span class="tag">mentors and admins</span></h3>
+      <ul class="tight">
+        <li>See each cohort, with who is inactive, stuck or scoring low</li>
+        <li>Hear speaking recordings and leave a comment</li>
+        <li>Post to a cohort, publish one-to-one slots</li>
+        <li>Admins set up labs, cohorts, staff and switches</li>
+        <li>An audit log of every staff change</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card primary"><p style="font-size:23px; line-height:1.35;">Students learn on a cheap shared phone with no internet. Mentors see who is stuck, hear their speaking and book one-to-one time. All of it is built for minors' privacy.</p></div>
+</section>
+
+<!-- 4 -->
+<section class="slide" data-n="4">
+  <div class="eyebrow">The student experience</div>
+  <h2>What a student sees <span class="small" style="font-size:20px;">(the live app)</span></h2>
+  <div class="body" style="align-items:center; margin-top:14px;">
+    <div class="phones">
+      <div class="phone"><img src="assets/phone-home.png" alt="Home screen"><p><b>Home</b><br>streak, progress, today's lesson, and a "saved on phone" badge</p></div>
+      <div class="phone"><img src="assets/phone-lessons.png" alt="Lesson list"><p><b>28 lessons, 3 tracks</b><br>English 15, aptitude 8, tech basics 5</p></div>
+      <div class="phone"><img src="assets/phone-wrong-answer.png" alt="Feedback after a wrong answer: why it is wrong"><p><b>"Why is it wrong?"</b><br>every wrong option has its own reason</p></div>
+    </div>
+    <div class="col" style="max-width:300px; gap:10px;">
+      <span class="tag good">Also built</span>
+      <ul class="tight" style="padding-left:22px;">
+        <li>Placement test</li><li>Six practice item types</li><li>Speaking practice</li><li>Community feed</li><li>One-to-one booking</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="slide" data-n="5">
+  <div class="eyebrow">The staff experience</div>
+  <h2>Mentors see who needs help</h2>
+  <div class="body">
+    <div class="col card">
+      <h3>Mentor</h3>
+      <ul class="tight">
+        <li>Cohort view with attention flags: <b>inactive</b>, <b>stuck</b>, <b>low scores</b></li>
+        <li>Play a student's recording through a short-lived link, then comment</li>
+        <li>Post announcements and live sessions to a cohort</li>
+        <li>Publish slots; students book, a database rule prevents double booking</li>
+        <li>Issue or reset backup codes, move or pause a student</li>
+      </ul>
+    </div>
+    <div class="col card">
+      <h3>Admin</h3>
+      <ul class="tight">
+        <li>Labs, cohorts and staff, with safe deletes (only when empty; never the last admin)</li>
+        <li>Feature switches for everyone or one student</li>
+        <li>Branding with a contrast check</li>
+        <li>Audit log of every staff write, with ids and never message text</li>
+        <li>Export or delete a student's data on request</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="slide" data-n="6">
+  <div class="eyebrow">Technical architecture</div>
+  <h2>A small, boring stack on purpose</h2>
+  <svg viewBox="0 0 1136 470" width="1136" height="470" role="img" aria-label="Architecture: phone PWA and staff section call one versioned API on a Supabase Edge Function, which uses Postgres with row-level security, a private storage bucket and Supabase Auth. Hosting on Cloudflare Pages, CI on GitHub Actions." style="margin-top:6px;">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#2d37b0"/></marker></defs>
+    <g font-size="19" fill="#1c1d3a">
+      <rect x="0" y="10" width="300" height="200" rx="18" fill="#fff" stroke="#dfe1ee"/>
+      <text x="20" y="42" font-weight="700" font-size="22">Student phone (PWA)</text>
+      <text x="20" y="76" fill="#5b5e7a">Svelte 5 · Vite · service worker</text>
+      <text x="20" y="106" fill="#5b5e7a">Dexie (IndexedDB): profiles,</text>
+      <text x="20" y="130" fill="#5b5e7a">event log, recordings waiting</text>
+      <text x="20" y="160" fill="#5b5e7a">Outbox of events with unique ids</text>
+      <text x="20" y="190" fill="#5b5e7a">4-digit PIN per profile</text>
+
+      <rect x="0" y="236" width="300" height="86" rx="18" fill="#fff" stroke="#dfe1ee"/>
+      <text x="20" y="268" font-weight="700" font-size="22">Staff section</text>
+      <text x="20" y="296" fill="#5b5e7a" font-size="18">Lazy chunk, own Google login</text>
+
+      <rect x="396" y="10" width="360" height="200" rx="18" fill="#2d37b0"/>
+      <text x="416" y="42" font-weight="700" font-size="22" fill="#fff">One versioned API: /v1</text>
+      <text x="416" y="70" fill="#d8daf5" font-size="17">Edge Function (Deno), 47 routes</text>
+      <g font-size="18" fill="#fff">
+        <rect x="416" y="92" width="150" height="34" rx="8" fill="#4650c9"/><text x="428" y="115">handler · Zod</text>
+        <rect x="576" y="92" width="160" height="34" rx="8" fill="#4650c9"/><text x="588" y="115">service · rules</text>
+        <rect x="416" y="136" width="320" height="34" rx="8" fill="#4650c9"/><text x="428" y="159">repository · the only SQL</text>
+      </g>
+      <text x="416" y="196" fill="#d8daf5" font-size="16">Identity and role come from the session</text>
+
+      <rect x="396" y="236" width="360" height="86" rx="18" fill="#fff" stroke="#dfe1ee"/>
+      <text x="416" y="268" font-weight="700" font-size="22">Supabase Auth</text>
+      <text x="416" y="296" fill="#5b5e7a" font-size="18">Google sign-in, backup codes</text>
+
+      <rect x="852" y="10" width="284" height="120" rx="18" fill="#fff" stroke="#dfe1ee"/>
+      <text x="872" y="42" font-weight="700" font-size="22">Postgres</text>
+      <text x="872" y="72" fill="#5b5e7a" font-size="18">14 migrations; row-level</text>
+      <text x="872" y="98" fill="#5b5e7a" font-size="18">security on every table</text>
+
+      <rect x="852" y="150" width="284" height="100" rx="18" fill="#fff" stroke="#dfe1ee"/>
+      <text x="872" y="182" font-weight="700" font-size="22">Private storage</text>
+      <text x="872" y="212" fill="#5b5e7a">Recordings, 5-minute</text>
+      <text x="872" y="236" fill="#5b5e7a">signed links only</text>
+    </g>
+    <g stroke="#2d37b0" stroke-width="3" fill="none" marker-end="url(#ar)">
+      <path d="M300 110 H392"/><path d="M300 280 H340 V160 H392" />
+      <path d="M756 70 H848"/><path d="M756 160 H800 V200 H848"/><path d="M576 214 V232"/>
+    </g>
+    <g font-size="18" fill="#1c1d3a">
+      <rect x="0" y="352" width="1136" height="48" rx="12" fill="#e8e9f7"/>
+      <text x="20" y="383"><tspan font-weight="700">Hosting:</tspan> Cloudflare Pages (static app and lesson packs)</text>
+      <rect x="0" y="412" width="1136" height="48" rx="12" fill="#fdf0dc"/>
+      <text x="20" y="443"><tspan font-weight="700">CI:</tspan> GitHub Actions: unit, database and browser tests, gitleaks, semgrep, trivy, npm audit</text>
+    </g>
+  </svg>
+</section>
+
+<!-- 7 -->
+<section class="slide" data-n="7">
+  <div class="eyebrow">Technical: offline first</div>
+  <h2>The phone is the primary store</h2>
+  <div class="flow" style="margin-top:40px;">
+    <div class="step"><i>1</i><b>Student acts</b><span>Answers, finishes a lesson, records speech</span></div><div class="arrow">→</div>
+    <div class="step"><i>2</i><b>Saved on the phone</b><span>An event with a unique id, instantly</span></div><div class="arrow">→</div>
+    <div class="step"><i>3</i><b>Outbox uploads</b><span>Small batches, retried with back-off when online</span></div><div class="arrow">→</div>
+    <div class="step"><i>4</i><b>Server accepts once</b><span>The same id twice changes nothing</span></div>
+  </div>
+  <div class="body" style="margin-top:34px;">
+    <div class="col card"><ul class="tight">
+      <li>A lesson never waits for the network, and a failed sync says "saved on phone, will upload later"</li>
+      <li>Progress is replayed from an append-only event log; events are never edited</li>
+    </ul></div>
+    <div class="col card"><ul class="tight">
+      <li>Old phones keep working: unknown fields are ignored, and an unknown event type triggers a re-pull</li>
+      <li>Lesson packs are content-addressed and checked by hash before use</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="slide" data-n="8">
+  <div class="eyebrow">Technical: engineering decisions</div>
+  <h2>Choices that keep it changeable</h2>
+  <div class="grid3" style="margin-top:22px; flex:1;">
+    <div class="card"><h3>Ports and adapters</h3><p class="small">Services import no Supabase. A test fails the build if anything else does. Swapping the provider means writing one adapter.</p></div>
+    <div class="card"><h3>One shared contract</h3><p class="small">Zod shapes are shared by the app and the server, so a change is checked on both sides in one commit.</p></div>
+    <div class="card"><h3>Fakes proved against the real thing</h3><p class="small">The same contract tests run on in-memory repositories and on real Postgres. This caught a bug that only Postgres showed.</p></div>
+    <div class="card"><h3>Concurrency is the database's job</h3><p class="small">One live booking per slot is a partial unique index; the two-booking limit is counted under a row lock; tested at the same moment.</p></div>
+    <div class="card"><h3>Small by design</h3><p class="small">A 120 KB first-load budget checked in CI. Staff, community and booking are lazy chunks, so a student never downloads them.</p></div>
+    <div class="card accent"><h3>Deliberately not used</h3><p class="small">Microservices, queues, GraphQL, a custom backend server, Realtime. Changing this needs a decision record.</p></div>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="slide" data-n="9">
+  <div class="eyebrow">Technical: security and privacy</div>
+  <h2>Built for children's data</h2>
+  <div class="body">
+    <div class="col card"><h3>Who can see what</h3><ul class="tight">
+      <li>Row-level security on every table, repeated in the API</li>
+      <li>Students see their rows, mentors their cohorts, admins everything</li>
+      <li>Isolation tests with several students and cohorts</li>
+      <li>Identity and role come from the session, never the request</li>
+      <li>A student's private note is readable only by that mentor</li>
+    </ul></div>
+    <div class="col card"><h3>What is kept and shown</h3><ul class="tight">
+      <li>No personal data in logs or URLs</li>
+      <li>Recordings play only through 5-minute signed links</li>
+      <li>Clients see error codes, never stack traces or SQL</li>
+      <li>Export and delete on request</li>
+      <li>Audit log keeps ids, never message text</li>
+    </ul></div>
+    <div class="col card"><h3>Secrets and access</h3><ul class="tight">
+      <li>Secrets only in environment settings</li>
+      <li>The phone never holds a service key</li>
+      <li>gitleaks in CI; a full-history scan found nothing</li>
+      <li>Backup codes stored as keyed hashes, rate limited</li>
+      <li>PIN lock on a shared phone; idle sign-out for staff</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="slide" data-n="10">
+  <div class="eyebrow">Quality evidence <span class="small" style="text-transform:none; letter-spacing:0;">(as submitted, 30 Oct 2026)</span></div>
+  <h2>How we know it works</h2>
+  <div class="grid4" style="margin-top:34px;">
+    <div class="card stat"><b>1,158</b><span>unit tests</span></div>
+    <div class="card stat"><b>201</b><span>database tests on real Postgres</span></div>
+    <div class="card stat"><b>20</b><span>browser tests (student and staff flows)</span></div>
+    <div class="card stat"><b>90.9%</b><span>statement coverage, minimum 70%</span></div>
+    <div class="card stat"><b>47</b><span>API routes</span></div>
+    <div class="card stat"><b>14</b><span>database migrations, each with a rollback</span></div>
+    <div class="card stat"><b>119.5 KB</b><span>first load, budget 120 KB</span></div>
+    <div class="card stat"><b>28</b><span>lessons in three tracks</span></div>
+  </div>
+  <p class="small" style="margin-top:26px;">Every pull request also runs gitleaks, semgrep, trivy and npm audit. Strict TypeScript, ESLint size and complexity limits, commit lint.</p>
+</section>
+
+<!-- 11 -->
+<section class="slide" data-n="11">
+  <div class="eyebrow">How AI built it</div>
+  <h2>AI wrote the code. I directed, tested and merged.</h2>
+  <div class="grid3" style="margin-top:36px;">
+    <div class="card stat"><b>~236</b><span>commits since 15 October 2026</span></div>
+    <div class="card stat"><b>189 of 190</b><span>non-merge commits co-authored by Claude<br>(93 Opus 5.5, 96 Sonnet 5.5; one is an automated update)</span></div>
+    <div class="card stat"><b>Every PR</b><span>merged by me, never by the AI</span></div>
+  </div>
+  <div class="card primary" style="margin-top:34px;"><p style="font-size:26px; line-height:1.4;">The question was not "can AI write code". It was "how do I make its output trustworthy enough to give to children's data".</p></div>
+  <p class="small" style="margin-top:22px;">The next four slides show the method: a loop, context, agents and guardrails, and where the human stays in charge.</p>
+</section>
+
+<!-- 12 -->
+<section class="slide" data-n="12">
+  <div class="eyebrow">AI method 1</div>
+  <h2>The loop every piece went through</h2>
+  <div class="flow" style="margin-top:44px; flex-wrap:nowrap;">
+    <div class="step"><i>1</i><b>Spec</b><span>I choose between options the AI lays out</span></div>
+    <div class="step"><i>2</i><b>Plan</b><span>Exact files, signatures and tests</span></div>
+    <div class="step"><i>3</i><b>Test first</b><span>Red, green, refactor. Deviations logged as rulings</span></div>
+    <div class="step"><i>4</i><b>Gate</b><span>Format, unit, typecheck, lint, database suite</span></div>
+  </div>
+  <div class="flow" style="margin-top:44px;">
+    <div class="step"><i>5</i><b>Fresh review</b><span>A separate model run that never saw the code</span></div>
+    <div class="step"><i>6</i><b>Fix pass</b><span>Each serious finding gets a failing test first</span></div>
+    <div class="step"><i>7</i><b>Pull request</b><span>Rulings and deferred minors listed</span></div>
+    <div class="step"><i>8</i><b>I merge</b><span>Only the owner merges</span></div>
+  </div>
+  <p class="small" style="margin-top:34px;">A test that passed before the code existed was treated as broken. Plans are written so a cheaper model can execute them and the strongest model is kept for review.</p>
+</section>
+
+<!-- 13 -->
+<section class="slide" data-n="13">
+  <div class="eyebrow">AI method 2</div>
+  <h2>Context engineering: documents, not chat history</h2>
+  <div class="card" style="margin-top:18px; padding:10px 14px;">
+    <table>
+      <tr><th>Context</th><th>What it does</th></tr>
+      <tr><td>CLAUDE.md, AGENTS.md, GEMINI.md</td><td>Source of truth, session start, definition of done. Three files so any AI tool lands in the same place.</td></tr>
+      <tr><td>Nine rule files</td><td>Coding, architecture, security, privacy, database, testing, offline sync, AI guardrails, git. Read when a task touches that area.</td></tr>
+      <tr><td>Task router</td><td>Which rules and reviewers a kind of task needs.</td></tr>
+      <tr><td>Decision records</td><td>Why a thing is the way it is, so the AI does not re-argue it.</td></tr>
+      <tr><td>Gotchas</td><td>Mistakes that happened once, written down so they are not repeated.</td></tr>
+      <tr><td>Plans and worklog</td><td>Each task states what it consumes and produces, because an executor sees only its own task.</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- 14 -->
+<section class="slide" data-n="14">
+  <div class="eyebrow">AI method 3</div>
+  <h2>Agents, hooks and guardrails</h2>
+  <div class="body">
+    <div class="col card"><h3>Four read-only reviewers</h3><ul class="tight">
+      <li><b>architect</b> plans risky changes first</li><li><b>spec</b>, <b>code</b> and <b>security</b> reviewers judge the diff</li>
+      <li>They have no edit tools, so they can only report</li><li>Each ends with PASS or FAIL and ranked findings</li></ul></div>
+    <div class="col card"><h3>Hooks that enforce rules</h3><ul class="tight">
+      <li>Claude hooks block edits on <code>main</code> and writes to secret files, and format after each edit</li>
+      <li>Git hooks: commit lint, secret scan before each commit, push guard</li>
+      <li>CI blocks the PR on high-severity findings</li></ul></div>
+    <div class="col card"><h3>Guardrails for AI in the product</h3><ul class="tight">
+      <li>Designed before any code: student text is data, never instructions</li>
+      <li>Mask personal data, topic limits, safeguarding path for distress</li>
+      <li>The doubt solver is planned, not built; the product calls no AI today</li></ul></div>
+  </div>
+</section>
+
+<!-- 15 -->
+<section class="slide" data-n="15">
+  <div class="eyebrow">AI method 4</div>
+  <h2>The human in the loop</h2>
+  <div class="body">
+    <div class="col card"><h3>What the AI did</h3><ul class="tight">
+      <li>Drafted specs, plans, code, tests and lessons</li><li>Reviewed branches with fresh eyes</li><li>Kept the docs in step with the code</li></ul></div>
+    <div class="col card primary"><h3>What I did</h3><ul class="tight">
+      <li>Chose what to build and what to cut</li><li>Merged every pull request</li>
+      <li>Ran the real product on phone and laptop</li><li>Created accounts, keys, hosting, live migrations and deploys</li></ul></div>
+  </div>
+  <div class="card accent" style="margin-top:14px;"><p style="font-size:21px; line-height:1.4;"><b>Real bugs came from using the live app:</b> recordings blocked by the browser's security policy, the right answer almost always being option A, an empty recordings list, a missing migration. I also noticed that no lesson used speaking, so I recorded the clips myself.</p></div>
+</section>
+
+<!-- 16 -->
+<section class="slide" data-n="16">
+  <div class="eyebrow">How effective was it</div>
+  <h2>The process found what the AI got wrong</h2>
+  <div class="card" style="margin-top:10px; padding:6px 14px;">
+    <table class="w3" style="font-size:19px;">
+      <tr><th>What went wrong</th><th>Caught by</th><th>What changed</th></tr>
+      <tr><td>A paging cursor passed every in-memory test and crashed on Postgres</td><td>Fresh review</td><td>Contract tests run on both repositories</td></tr>
+      <tr><td>Another mentor in the same cohort could read a student's private note</td><td>Fresh review</td><td>Row-level security fix, test first</td></tr>
+      <tr><td>An older app dropped a new event type and lost it forever</td><td>Fresh review</td><td>Pull cursor tracks known event types</td></tr>
+      <tr><td>Two students could race for one slot, or two admins delete each other</td><td>Review, tests</td><td>Database index and locks, tested together</td></tr>
+      <tr><td>Tests used a fake backend and missed the audio being blocked</td><td>My use of the live site</td><td>Policy fixed, test added</td></tr>
+    </table>
+  </div>
+  <p class="small" style="margin-top:10px; font-size:19px;">AI is effective when it is given rules, tests and an independent reviewer, and when a person tests the real thing.</p>
+</section>
+
+<!-- 17 -->
+<section class="slide" data-n="17">
+  <div class="eyebrow">Honest limits</div>
+  <h2>What is not true yet</h2>
+  <div class="body">
+    <div class="col card"><h3>Evidence gaps</h3><ul class="tight">
+      <li>Lessons are AI-drafted and approved by me, not yet by a mentor panel</li>
+      <li>No testing with real students or on the cheapest phones</li>
+      <li>Not DPDP compliant: consent, a named data owner and legal review are still needed</li></ul></div>
+    <div class="col card"><h3>Not built</h3><ul class="tight">
+      <li>AI doubt solver, org-wide dashboard and CSV</li>
+      <li>Post attachments, Google Calendar and Meet for slots</li>
+      <li>Mentor notifications</li></ul></div>
+    <div class="col card"><h3>Operational</h3><ul class="tight">
+      <li>Free Supabase projects pause after about a week idle</li>
+      <li>Backups and retention jobs need the owner's keys</li>
+      <li>Audit entry is not in the same transaction as the change</li></ul></div>
+  </div>
+</section>
+
+<!-- 18 -->
+<section class="slide" data-n="18">
+  <div class="eyebrow">What I learned</div>
+  <h2>Five lessons</h2>
+  <div class="body" style="margin-top:22px;">
+    <div class="col">
+      <div class="card"><b>1.</b> Test against the real browser and database early. Fakes hide things.</div>
+      <div class="card"><b>2.</b> Fresh eyes beat the author. A reviewer who never saw the code found the serious bugs.</div>
+      <div class="card"><b>3.</b> Write the context down. Documents survive; chat history does not.</div>
+    </div>
+    <div class="col">
+      <div class="card"><b>4.</b> Decide the scope cut-off before the last day, and ship smaller honest versions with a decision record.</div>
+      <div class="card"><b>5.</b> Never paste live tokens into a chat, and keep owner-only steps with the owner.</div>
+      <div class="card accent"><b>Be honest in the write-up.</b> Listing what is not built earned more trust than hiding it.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 19 -->
+<section class="slide" data-n="19">
+  <div class="eyebrow">After the win</div>
+  <h2>What happens next</h2>
+  <div class="body">
+    <div class="col card"><h3>Already built since <span class="tag good">local, tested, not deployed</span></h3><ul class="tight">
+      <li>Students see their recordings and the mentor's comment</li>
+      <li>Admins rename labs and cohorts and move a cohort</li>
+      <li>Countdown and "Add to calendar" on session posts</li></ul></div>
+    <div class="col card"><h3>Next <span class="tag warn">in order</span></h3><ul class="tight">
+      <li><b>Field test</b> with real students on cheap phones</li>
+      <li><b>Mentor review</b> of every lesson</li>
+      <li><b>Child-safety basics:</b> guardian consent, a data owner, a mentor code of conduct, a way to report concerns</li>
+      <li>A new repo with its own Supabase and Cloudflare projects</li>
+      <li>Mentor notifications, harder levels, then the AI doubt solver</li></ul></div>
+  </div>
+</section>
+
+<!-- 20 -->
+<section class="slide" data-n="20" style="justify-content:center;">
+  <div class="eyebrow">Thank you</div>
+  <h1 style="font-size:64px;">Questions?</h1>
+  <div class="bar"></div>
+  <p class="lede" style="color:var(--ink);">Shiksha Path: learning that works offline, in Hindi, on a shared phone.</p>
+  <div class="card" style="margin-top:34px; max-width:760px;">
+    <p style="font-size:23px; line-height:1.6;"><b>Code:</b> github.com/sabhinav9889/shiksha-path<br><b>Live app:</b> shiksha-path.pages.dev<br><b>Release:</b> tag hackathon-2026-submission</p>
+  </div>
+</section>
+
+</div></div>
+<div id="progress"></div>
+<div id="hint">← → or space to move · F for full screen · Home / End</div>
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var deck = document.getElementById('deck');
+  var bar = document.getElementById('progress');
+  var i = 0;
+  function fit() {
+    var s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+    deck.style.transform = 'scale(' + s + ')';
+  }
+  function show(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function (el, k) { el.classList.toggle('active', k === i); });
+    bar.style.width = ((i + 1) / slides.length * 100) + '%';
+    try { history.replaceState(null, '', '#' + (i + 1)); } catch (e) {}
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); show(i + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); show(i - 1); }
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(slides.length - 1);
+    else if (e.key === 'f' || e.key === 'F') {
+      if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen();
+    }
+  });
+  document.addEventListener('click', function (e) { show(e.clientX > window.innerWidth / 2 ? i + 1 : i - 1); });
+  window.addEventListener('resize', fit);
+  fit();
+  var start = parseInt((location.hash || '').slice(1), 10);
+  show(isNaN(start) ? 0 : start - 1);
+})();
+</script>
+</body>
+</html>
