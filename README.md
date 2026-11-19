@@ -1,7 +1,7 @@
 # Shiksha Path: presentation
 
 The talk about Shiksha Path, a learning app that works offline, in Hindi, on a shared phone, and
-how it was built with Claude Code (AI Product Hackathon 2026, first prize).
+how it was built with Claude Code (AI Product Hackathon 2026).
 
 | File                                                             | What it is                                                           |
 | ---------------------------------------------------------------- | -------------------------------------------------------------------- |
