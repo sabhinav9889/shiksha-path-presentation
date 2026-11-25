@@ -3,12 +3,13 @@
 The talk about Shiksha Path, a learning app that works offline, in Hindi, on a shared phone, and
 how it was built with Claude Code (AI Product Hackathon 2026).
 
-| File                                                             | What it is                                                           |
-| ---------------------------------------------------------------- | -------------------------------------------------------------------- |
-| [`index.html`](index.html)                                       | The deck. Open it in any browser. No server, no internet needed.     |
-| [`Shiksha-Path-Presentation.pdf`](Shiksha-Path-Presentation.pdf) | The same 20 slides as a PDF, for a laptop without your files.        |
-| [`SPEAKER-NOTES.md`](SPEAKER-NOTES.md)                           | A talk track for each slide (about 15 minutes) and likely questions. |
-| `assets/`                                                        | Phone screenshots of the live app used on the slides.                |
+| File                                                                           | What it is                                                                                                                                                |
+| ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`index.html`](index.html)                                                     | The deck. Open it in any browser. No server, no internet needed.                                                                                          |
+| [`Shiksha-Path-Presentation.pdf`](Shiksha-Path-Presentation.pdf)               | The same 20 slides as a PDF, for a laptop without your files.                                                                                             |
+| [`Shiksha-Path-Friday-Presentation.pdf`](Shiksha-Path-Friday-Presentation.pdf) | The 35-slide, 30-minute talk: the student, mentor and admin dashboards (features, tech and decisions), the architecture, and how AI was used to build it. |
+| [`SPEAKER-NOTES.md`](SPEAKER-NOTES.md)                                         | A talk track for each slide (about 15 minutes) and likely questions.                                                                                      |
+| `assets/`                                                                      | Phone screenshots of the live app used on the slides.                                                                                                     |
 
 ## Presenting
 
