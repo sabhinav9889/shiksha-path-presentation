@@ -7,7 +7,7 @@ how it was built with Claude Code (AI Product Hackathon 2026).
 | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`index.html`](index.html)                                                     | The deck. Open it in any browser. No server, no internet needed.                                                                                          |
 | [`Shiksha-Path-Presentation.pdf`](Shiksha-Path-Presentation.pdf)               | The same 20 slides as a PDF, for a laptop without your files.                                                                                             |
-| [`Shiksha-Path-AI-Hackathon-Presentation.pdf`](Shiksha-Path-AI-Hackathon-Presentation.pdf) | The 35-slide, 30-minute talk: the student, mentor and admin dashboards (features, tech and decisions), the architecture, and how AI was used to build it. |
+| [`Shiksha-Path-AI-Hackathon-Presentation.pdf`](Shiksha-Path-AI-Hackathon-Presentation.pdf) | The 21-slide, 30-minute talk in plain language: the problem, the three dashboards in short (shown live in the demo), how it is built, and how AI was used to build it. |
 | [`SPEAKER-NOTES.md`](SPEAKER-NOTES.md)                                         | A talk track for each slide (about 15 minutes) and likely questions.                                                                                      |
 | `assets/`                                                                      | Phone screenshots of the live app used on the slides.                                                                                                     |
 
